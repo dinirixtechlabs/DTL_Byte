@@ -273,6 +273,28 @@ $profilePhoto = "uploads/".$user['photo'];
 
 </div>
 
+<div id="forgotForm" style="display:none;">
+
+<form action="forgot_process.php" method="POST">
+
+<h3 style="text-align:center;">Reset Password</h3>
+
+<input type="email" name="email" placeholder="Enter your registered email" required>
+
+<input type="password" name="new_password" placeholder="Enter New Password" required>
+
+<input type="password" name="confirm_password" placeholder="Confirm Password" required>
+
+<button name="reset">Change Password</button>
+
+<p style="text-align:center;margin-top:10px;">
+<a href="#" onclick="showLogin()">Back to Login</a>
+</p>
+
+</form>
+
+</div>
+
 </div>
 
 </div>

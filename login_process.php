@@ -4,24 +4,30 @@ include "db.php";
 
 if(isset($_POST['login'])){
 
-$email=$_POST['email'];
-$password=$_POST['password'];
+$email = trim($_POST['email']);
+$password = trim($_POST['password']);
 
-$stmt=$conn->prepare("SELECT * FROM users WHERE email=?");
+if(empty($email) || empty($password)){
+header("Location: index.php?error=emptyfields");
+exit();
+}
+
+$stmt = $conn->prepare("SELECT * FROM users WHERE email=?");
 $stmt->bind_param("s",$email);
 $stmt->execute();
 
-$result=$stmt->get_result();
+$result = $stmt->get_result();
 
-if($result->num_rows>0){
+if($result->num_rows > 0){
 
-$row=$result->fetch_assoc();
+$row = $result->fetch_assoc();
 
 if(password_verify($password,$row['password'])){
 
-$_SESSION['email']=$email;
+$_SESSION['email'] = $row['email'];
 
-header("Location:index.php");
+header("Location: index.php?msg=loginsuccess");
+exit();
 
 }else{
 
@@ -36,6 +42,11 @@ header("Location: index.php?error=nouser");
 exit();
 
 }
+
+}else{
+
+header("Location: index.php");
+exit();
 
 }
 ?>
