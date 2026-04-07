@@ -88,12 +88,33 @@ $profilePhoto = "uploads/".$user['photo'];
 
 <div class="sidebar">
 
-<a href="#">Dashboard</a>
-<a href="#notes">Notes</a>
-<a href="#roadmaps">Roadmaps</a>
-<a href="#source">Source Codes</a>
-<a href="payment_history.php">Payments</a>
-<a href="profile.php">Profile</a>
+<a href="index.php">
+<span>🏠</span> Dashboard
+</a>
+
+<a href="#notes">
+<span>📚</span> Notes
+</a>
+
+<a href="#roadmaps">
+<span>🗺️</span> Roadmaps
+</a>
+
+<a href="#source">
+<span>💻</span> Source Codes
+</a>
+
+<a href="payment_history.php">
+<span>💳</span> Payments
+</a>
+
+<a href="profile.php">
+<span>👤</span> Profile
+</a>
+
+<a href="admin/admin_login.php" class="admin-btn">
+<span>🛠️</span> Admin
+</a>
 
 </div>
 
@@ -223,8 +244,42 @@ $profilePhoto = "uploads/".$user['photo'];
 </div>
 
 <!-- LOGIN -->
-
 <div id="loginForm">
+
+<?php
+
+/* SUCCESS MESSAGE */
+
+if(isset($_GET['msg'])){
+
+if($_GET['msg']=="signupsuccess"){
+echo "<p class='success-msg'>✅ Signup Successful! Please login.</p>";
+}
+
+if($_GET['msg']=="passwordreset"){
+echo "<p class='success-msg'>✅ Password changed successfully!</p>";
+}
+
+}
+
+/* ERROR MESSAGE */
+
+if(isset($_GET['error'])){
+
+if($_GET['error']=="wrongpassword"){
+echo "<p class='error-msg'>❌ Wrong Password</p>";
+}
+
+if($_GET['error']=="nouser"){
+echo "<p class='error-msg'>❌ User not found</p>";
+}
+
+if($_GET['error']=="emptyfields"){
+echo "<p class='error-msg'>❌ Please fill all fields</p>";
+}
+
+}
+?>
 
 <form action="login_process.php" method="POST">
 

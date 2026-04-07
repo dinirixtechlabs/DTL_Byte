@@ -12,7 +12,7 @@ header("Location: index.php?error=emptyfields");
 exit();
 }
 
-$stmt = $conn->prepare("SELECT * FROM users WHERE email=?");
+$stmt = $conn->prepare("SELECT email,password FROM users WHERE email=?");
 $stmt->bind_param("s",$email);
 $stmt->execute();
 
@@ -42,6 +42,9 @@ header("Location: index.php?error=nouser");
 exit();
 
 }
+
+$stmt->close();
+$conn->close();
 
 }else{
 
