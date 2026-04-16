@@ -2,13 +2,70 @@
 session_start();
 include("db.php");
 
+/* ---------- OTP VERIFY (REPLACE OLD CODE WITH THIS) ---------- */
+if(isset($_POST['verify_otp'])){
+
+    if(!isset($_SESSION['reset_email'])){
+        header("Location: index.php");
+        exit();
+    }
+
+    $email = $_SESSION['reset_email'];
+    $otp = filter_input(INPUT_POST, 'otp', FILTER_SANITIZE_NUMBER_INT);
+
+    if(empty($otp)){
+    $_SESSION['otp_error'] = "Please enter OTP";
+    header("Location: index.php?otp=sent");
+    exit();
+    }
+
+    $stmt = $conn->prepare("SELECT otp, otp_expiry FROM users WHERE email=?");
+
+    if(!$stmt){
+        die("SQL Error: " . $conn->error);
+    }
+
+    $stmt->bind_param("s",$email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $data = $result->fetch_assoc();
+
+    if($data){
+
+        $current = date("Y-m-d H:i:s");
+
+        if($otp == $data['otp'] && strtotime($current) <= strtotime($data['otp_expiry'])){
+
+            $_SESSION['otp_verified'] = true;
+            $_SESSION['show_reset'] = true;
+            unset($_SESSION['otp_sent']);
+
+            // ✅ CLEAR OTP AFTER SUCCESS
+            $clear = $conn->prepare("UPDATE users SET otp=NULL, otp_expiry=NULL WHERE email=?");
+            $clear->bind_param("s", $email);
+            $clear->execute();
+
+            header("Location: index.php?reset=1");
+            exit();
+
+        }else{
+            $_SESSION['otp_error'] = "Invalid or Expired OTP";
+            header("Location: index.php?otp=sent");
+            exit();
+        }
+
+    }else{
+        $otp_error = "Something went wrong. Try again.";
+    }
+}
+
 /* ---------- LOGIN POPUP CONTROL ---------- */
 
-if(!isset($_SESSION['email']) || isset($_GET['error']) || isset($_GET['msg'])){
+if(!isset($_SESSION['email']) && !isset($_GET['reset']) && !isset($_GET['otp'])){
 echo "<script>
-window.onload=function(){
+window.addEventListener('load', function(){
 document.getElementById('authModal').style.display='flex';
-}
+});
 </script>";
 }
 
@@ -18,11 +75,23 @@ $profilePhoto = "images/profile_icon.png";
 
 if(isset($_SESSION['email'])){
 
-$email = $_SESSION['email'];
+    $email = $_SESSION['email'];
 
-$stmt = $conn->prepare("SELECT photo FROM users WHERE email=?");
-$stmt->bind_param("s",$email);
-$stmt->execute();
+    $stmt = $conn->prepare("SELECT photo FROM users WHERE email=?");
+
+    if(!$stmt){
+        die("SQL Error: " . $conn->error);
+    }
+
+    $stmt->bind_param("s",$email);
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+    $user = $result->fetch_assoc();
+
+    if(!empty($user['photo'])){
+        $profilePhoto = "uploads/".$user['photo'];
+    }
 
 $result = $stmt->get_result();
 $user = $result->fetch_assoc();
@@ -232,7 +301,7 @@ $profilePhoto = "uploads/".$user['photo'];
 
 <!-- ================= LOGIN SIGNUP POPUP ================= -->
 
-<?php if(!isset($_SESSION['email'])){ ?>
+<?php if(!isset($_SESSION['email']) && !isset($_GET['reset'])){ ?>
 
 <div id="authModal" class="modal">
 
@@ -330,17 +399,39 @@ echo "<p class='error-msg'>❌ Please fill all fields</p>";
 
 <div id="forgotForm" style="display:none;">
 
-<form action="forgot_process.php" method="POST">
+<h3 style="text-align:center;">Forgot Password</h3>
 
-<h3 style="text-align:center;">Reset Password</h3>
+<?php if(!isset($_SESSION['otp_sent'])){ ?>
+
+<!-- EMAIL INPUT -->
+
+<form action="forgot_password_process.php" method="POST">
 
 <input type="email" name="email" placeholder="Enter your registered email" required>
 
-<input type="password" name="new_password" placeholder="Enter New Password" required>
+<button name="send_otp">Send OTP</button>
 
-<input type="password" name="confirm_password" placeholder="Confirm Password" required>
+</form>
 
-<button name="reset">Change Password</button>
+<?php } else { ?>
+
+<!-- OTP INPUT -->
+
+<form method="POST">
+
+<input type="text" name="otp" placeholder="Enter OTP" required>
+
+<button name="verify_otp">Verify OTP</button>
+
+<?php if(isset($_SESSION['otp_error'])){ ?>
+<p class="error-msg"><?php echo $_SESSION['otp_error']; ?></p>
+<?php unset($_SESSION['otp_error']); } ?>
+
+</form>
+
+<?php } ?>
+
+</div>
 
 <p style="text-align:center;margin-top:10px;">
 <a href="#" onclick="showLogin()">Back to Login</a>
@@ -356,7 +447,52 @@ echo "<p class='error-msg'>❌ Please fill all fields</p>";
 
 <?php } ?>
 
+<?php if(isset($_GET['otp'])){ ?>
+<script>
+window.addEventListener('load', function(){
+document.getElementById('authModal').style.display='flex';
+showForgot();
+});
+</script>
+<?php } ?>
 
+<!-- RESET PASSWORD MODAL -->
+<div id="resetModal" class="modal">
+
+<div class="modal-content">
+<span class="close" onclick="closeReset()">&times;</span>
+
+<h2>Set New Password</h2>
+
+<form method="POST" action="reset_password.php">
+
+<input type="password" name="new_password" placeholder="New Password" required>
+<input type="password" name="confirm_password" placeholder="Confirm Password" required>
+
+<button type="submit" name="reset">Reset Password</button>
+
+</form>
+
+</div>
+</div>
+<?php if(isset($_GET['reset'])){ ?>
+<script>
+window.addEventListener('load', function(){
+
+const reset = document.getElementById('resetModal');
+const auth = document.getElementById('authModal');
+
+if(auth){
+    auth.style.display = 'none'; // 🔥 close login modal
+}
+
+if(reset){
+    reset.style.display = 'flex';
+}
+
+});
+</script>
+<?php } ?>
 <script src="script.js"></script>
 
 </body>

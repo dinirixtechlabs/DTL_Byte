@@ -893,6 +893,83 @@ background:#1d4ed8;
 margin-left:230px;
 padding:30px;
 }
+/* VERIFY OTP PAGE */
+
+.box{
+background:#fff;
+padding:30px;
+border-radius:10px;
+box-shadow:0 0 10px rgba(0,0,0,0.1);
+width:300px;
+text-align:center;
+}
+
+input{
+width:100%;
+padding:10px;
+margin:10px 0;
+border:1px solid #ccc;
+border-radius:5px;
+}
+
+button{
+padding:10px;
+width:100%;
+background:#007bff;
+color:#fff;
+border:none;
+border-radius:5px;
+cursor:pointer;
+transition:0.3s;
+}
+
+button:hover{
+background:#0056b3;
+}
+
+.error{
+color:red;
+margin-bottom:10px;
+}
+
+/* RESET PASSWORD PAGE */
+
+.box{
+background:#fff;
+padding:30px;
+border-radius:10px;
+box-shadow:0 0 10px rgba(0,0,0,0.1);
+width:320px;
+text-align:center;
+}
+
+input{
+width:100%;
+padding:10px;
+margin:10px 0;
+border:1px solid #ccc;
+border-radius:5px;
+}
+
+button{
+padding:10px;
+width:100%;
+background:#28a745;
+color:#fff;
+border:none;
+border-radius:5px;
+cursor:pointer;
+transition:0.3s;
+}
+
+button:hover{
+background:#218838;
+}
+
+.error{
+color:red;
+margin-bottom:10px;
+}
 
 /* ================= RESPONSIVE ================= */
 

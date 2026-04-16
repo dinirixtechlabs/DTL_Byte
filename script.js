@@ -1,56 +1,76 @@
-// LOGIN TAB
-function showLogin(){
-document.getElementById("authModal").style.display = "flex";
+/* ================= MODAL HELPERS ================= */
 
-document.getElementById("loginForm").style.display = "block";
-document.getElementById("signupForm").style.display = "none";
-
-let forgot = document.getElementById("forgotForm");
-if(forgot) forgot.style.display = "none";
+function openModal(){
+const modal = document.getElementById("authModal");
+if(modal) modal.style.display = "flex";
 }
 
-// SIGNUP TAB
-function showSignup(){
-document.getElementById("authModal").style.display = "flex";
-
-document.getElementById("loginForm").style.display = "none";
-document.getElementById("signupForm").style.display = "block";
-
-let forgot = document.getElementById("forgotForm");
-if(forgot) forgot.style.display = "none";
-}
-
-// CLOSE MODAL
 function closeModal(){
-document.getElementById("authModal").style.display="none";
+const modal = document.getElementById("authModal");
+if(modal) modal.style.display = "none";
 }
 
-// FORGOT PASSWORD
+/* ================= TAB SWITCHING ================= */
+
+function showLogin(){
+openModal();
+
+const login = document.getElementById("loginForm");
+const signup = document.getElementById("signupForm");
+const forgot = document.getElementById("forgotForm");
+
+if(login) login.style.display = "block";
+if(signup) signup.style.display = "none";
+if(forgot) forgot.style.display = "none";
+}
+
+function showSignup(){
+openModal();
+
+const login = document.getElementById("loginForm");
+const signup = document.getElementById("signupForm");
+const forgot = document.getElementById("forgotForm");
+
+if(login) login.style.display = "none";
+if(signup) signup.style.display = "block";
+if(forgot) forgot.style.display = "none";
+}
+
 function showForgot(){
-document.getElementById("authModal").style.display="flex";
+openModal();
 
-document.getElementById("loginForm").style.display="none";
-document.getElementById("signupForm").style.display="none";
+fetch('forgot_password_process.php?reset=1')
+.then(() => {
 
-let forgot = document.getElementById("forgotForm");
-if(forgot) forgot.style.display="block";
+const login = document.getElementById("loginForm");
+const signup = document.getElementById("signupForm");
+const forgot = document.getElementById("forgotForm");
+
+if(login) login.style.display = "none";
+if(signup) signup.style.display = "none";
+if(forgot) forgot.style.display = "block";
+
+});
 }
 
-// SHOW / HIDE PASSWORD
+/* ================= PASSWORD TOGGLE ================= */
+
 function togglePassword(icon){
 const input = icon.previousElementSibling;
+
+if(!input) return;
 
 if(input.type === "password"){
 input.type = "text";
 icon.innerText = "🙈";
-}
-else{
+}else{
 input.type = "password";
 icon.innerText = "👁️";
 }
 }
 
-// SIDEBAR TOGGLE
+/* ================= SIDEBAR ================= */
+
 function toggleSidebar(){
 const sidebar = document.querySelector(".sidebar");
 if(sidebar){
@@ -58,7 +78,7 @@ sidebar.classList.toggle("active");
 }
 }
 
-// CLOSE SIDEBAR WHEN CLICK OUTSIDE
+/* Close sidebar when clicking outside */
 document.addEventListener("click", function(e){
 
 const sidebar = document.querySelector(".sidebar");
@@ -70,4 +90,13 @@ sidebar.classList.remove("active");
 }
 }
 
+});
+
+/* ================= CLOSE MODAL ON OUTSIDE CLICK ================= */
+
+window.addEventListener("click", function(e){
+const modal = document.getElementById("authModal");
+if(e.target === modal){
+modal.style.display = "none";
+}
 });
