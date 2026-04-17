@@ -22,7 +22,7 @@ $query->execute();
 $result = $query->get_result();
 $user = $result->fetch_assoc();
 
-if($user['password'] != $current){
+if(!password_verify($current, $user['password'])){
 
 $message = "❌ Current password is incorrect";
 
@@ -33,7 +33,10 @@ $message = "❌ New passwords do not match";
 }else{
 
 $stmt = $conn->prepare("UPDATE users SET password=? WHERE email=?");
-$stmt->bind_param("ss",$new,$email);
+$hashed = password_hash($new, PASSWORD_DEFAULT);
+
+$stmt = $conn->prepare("UPDATE users SET password=? WHERE email=?");
+$stmt->bind_param("ss",$hashed,$email);
 $stmt->execute();
 
 $message = "✅ Password updated successfully";

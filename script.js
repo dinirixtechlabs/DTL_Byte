@@ -39,9 +39,6 @@ if(forgot) forgot.style.display = "none";
 function showForgot(){
 openModal();
 
-fetch('forgot_password_process.php?reset=1')
-.then(() => {
-
 const login = document.getElementById("loginForm");
 const signup = document.getElementById("signupForm");
 const forgot = document.getElementById("forgotForm");
@@ -49,8 +46,13 @@ const forgot = document.getElementById("forgotForm");
 if(login) login.style.display = "none";
 if(signup) signup.style.display = "none";
 if(forgot) forgot.style.display = "block";
+}
 
-});
+function closeReset(){
+const reset = document.getElementById("resetModal");
+if(reset){
+reset.style.display = "none";
+}
 }
 
 /* ================= PASSWORD TOGGLE ================= */
@@ -95,8 +97,17 @@ sidebar.classList.remove("active");
 /* ================= CLOSE MODAL ON OUTSIDE CLICK ================= */
 
 window.addEventListener("click", function(e){
-const modal = document.getElementById("authModal");
-if(e.target === modal){
-modal.style.display = "none";
+
+const authModal = document.getElementById("authModal");
+const resetModal = document.getElementById("resetModal");
+
+// ❌ Do NOTHING (no closing)
+if(authModal && e.target === authModal){
+    // modal will NOT close
 }
+
+if(resetModal && e.target === resetModal){
+    // modal will NOT close
+}
+
 });

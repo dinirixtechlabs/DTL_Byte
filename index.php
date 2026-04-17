@@ -44,7 +44,7 @@ if(isset($_POST['verify_otp'])){
             $clear = $conn->prepare("UPDATE users SET otp=NULL, otp_expiry=NULL WHERE email=?");
             $clear->bind_param("s", $email);
             $clear->execute();
-
+            
             header("Location: index.php?reset=1");
             exit();
 
@@ -92,13 +92,6 @@ if(isset($_SESSION['email'])){
     if(!empty($user['photo'])){
         $profilePhoto = "uploads/".$user['photo'];
     }
-
-$result = $stmt->get_result();
-$user = $result->fetch_assoc();
-
-if(!empty($user['photo'])){
-$profilePhoto = "uploads/".$user['photo'];
-}
 
 }
 ?>
@@ -301,7 +294,7 @@ $profilePhoto = "uploads/".$user['photo'];
 
 <!-- ================= LOGIN SIGNUP POPUP ================= -->
 
-<?php if(!isset($_SESSION['email']) && !isset($_GET['reset'])){ ?>
+<?php if(!isset($_SESSION['email'])){ ?>
 
 <div id="authModal" class="modal">
 
@@ -403,6 +396,14 @@ echo "<p class='error-msg'>❌ Please fill all fields</p>";
 
 <?php if(!isset($_SESSION['otp_sent'])){ ?>
 
+<?php if(isset($_GET['error']) && $_GET['error']=="invalidemail"){ ?>
+<p class="error-msg">❌ Email not registered</p>
+<?php } ?>
+
+<?php if(isset($_GET['error']) && $_GET['error']=="mailfail"){ ?>
+<p class="error-msg">❌ Failed to send OTP. Try again</p>
+<?php } ?>
+
 <!-- EMAIL INPUT -->
 
 <form action="forgot_password_process.php" method="POST">
@@ -475,7 +476,8 @@ showForgot();
 
 </div>
 </div>
-<?php if(isset($_GET['reset'])){ ?>
+<?php if(isset($_GET['reset']) && isset($_SESSION['otp_verified'])){ 
+ ?>
 <script>
 window.addEventListener('load', function(){
 
@@ -483,7 +485,7 @@ const reset = document.getElementById('resetModal');
 const auth = document.getElementById('authModal');
 
 if(auth){
-    auth.style.display = 'none'; // 🔥 close login modal
+    auth.style.display = 'none';
 }
 
 if(reset){
