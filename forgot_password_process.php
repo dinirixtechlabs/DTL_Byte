@@ -19,9 +19,13 @@ require __DIR__ . '/PHPMailer/src/Exception.php';
 require __DIR__ . '/PHPMailer/src/PHPMailer.php';
 require __DIR__ . '/PHPMailer/src/SMTP.php';
 
+
+/* ========================================================= */
+/* ================= SEND OTP (FIRST TIME) ================== */
+/* ========================================================= */
+
 if(isset($_POST['send_otp'])){
 
-    // ✅ Validate email format
     $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
 
     if(!$email){
@@ -29,39 +33,73 @@ if(isset($_POST['send_otp'])){
         exit();
     }
 
-    // 🔍 Check if email exists
+    // check user exists
     $stmt = $conn->prepare("SELECT email FROM users WHERE email=?");
-    if(!$stmt){
-        die("SQL Error: " . $conn->error);
-    }
-
     $stmt->bind_param("s",$email);
     $stmt->execute();
     $result = $stmt->get_result();
 
     if($result->num_rows == 0){
-        // ❌ Email not registered
         header("Location: index.php?error=invalidemail");
         exit();
     }
 
-    // ✅ Email exists → generate OTP
-    $otp = random_int(100000,999999);
-    $expiry = date("Y-m-d H:i:s", strtotime("+10 minutes"));
-
-    $update = $conn->prepare("UPDATE users SET otp=?, otp_expiry=? WHERE email=?");
-    if(!$update){
-        die("SQL Error: " . $conn->error);
-    }
-
-    $update->bind_param("sss",$otp,$expiry,$email);
-    $update->execute();
-
-    // ✅ Store session
+    // store session
     $_SESSION['reset_email'] = $email;
     $_SESSION['otp_sent'] = true;
 
-    // 📧 Send OTP using PHPMailer
+    // send OTP
+    if(sendOTP($email, $conn)){
+        header("Location: index.php?otp=sent");
+        exit();
+    }else{
+        header("Location: index.php?error=mailfail");
+        exit();
+    }
+}
+
+
+/* ========================================================= */
+/* ================= RESEND OTP (AJAX) ====================== */
+/* ========================================================= */
+
+if(isset($_POST['resend'])){
+
+    if(!isset($_SESSION['reset_email'])){
+        echo "expired";
+        exit();
+    }
+
+    $email = $_SESSION['reset_email'];
+
+    if(sendOTP($email, $conn)){
+        echo "resent";
+    }else{
+        echo "fail";
+    }
+
+    exit();
+}
+
+
+/* ========================================================= */
+/* ================= OTP FUNCTION =========================== */
+/* ========================================================= */
+
+function sendOTP($email, $conn){
+
+    $otp = random_int(100000,999999);
+    $expiry = date("Y-m-d H:i:s", strtotime("+10 minutes"));
+
+    // save OTP in DB
+    $stmt = $conn->prepare("UPDATE users SET otp=?, otp_expiry=? WHERE email=?");
+    $stmt->bind_param("sss",$otp,$expiry,$email);
+
+    if(!$stmt->execute()){
+        return false;
+    }
+
+    // send mail
     $mail = new PHPMailer(true);
 
     try{
@@ -85,14 +123,10 @@ if(isset($_POST['send_otp'])){
         ";
 
         $mail->send();
+        return true;
 
     }catch(Exception $e){
-        header("Location: index.php?error=mailfail");
-        exit();
+        return false;
     }
-
-    // ✅ Redirect to OTP screen
-    header("Location: index.php?otp=sent");
-    exit();
 }
 ?>

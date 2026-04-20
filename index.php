@@ -340,6 +340,10 @@ if($_GET['error']=="emptyfields"){
 echo "<p class='error-msg'>❌ Please fill all fields</p>";
 }
 
+if($_GET['error']=="notverified"){
+echo "<p class='error-msg'>❌ Please verify your email first</p>";
+}
+
 }
 ?>
 
@@ -365,26 +369,35 @@ echo "<p class='error-msg'>❌ Please fill all fields</p>";
 
 </div>
 
-
-<!-- SIGNUP -->
-
 <div id="signupForm" style="display:none;">
 
 <form action="signup_process.php" method="POST">
 
 <input type="text" name="name" placeholder="Enter Name" required>
 
-<input type="email" name="email" placeholder="Enter Email" required>
-
-<div style="position:relative;">
-<input type="password" name="password" placeholder="Enter Password" required>
-
-<span onclick="togglePassword(this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;">
-👁️
-</span>
+<div class="email-group">
+    <input type="email" id="signup_email" name="email" placeholder="Enter Email" required>
+    <button type="button" class="verify-btn" onclick="sendOTP()">Verify</button>
 </div>
 
-<button name="signup">Signup</button>
+<div id="otp_section" style="display:none;">
+    <input type="text" id="otp" placeholder="Enter OTP">
+
+    <button type="button" onclick="verifyOTP()">Submit OTP</button>
+
+    <p id="otp_timer" style="font-size:12px;color:#555;"></p>
+
+    <button type="button" id="resend_btn" onclick="resendOTP()" disabled>
+        Resend OTP
+    </button>
+</div>
+
+<div style="position:relative;">
+<input type="password" id="signup_password" name="password" placeholder="Enter Password" disabled required>
+<span onclick="togglePassword(this)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;">👁️</span>
+</div>
+
+<button type="submit" id="signup_btn" name="signup" disabled>Signup</button>
 
 </form>
 
@@ -396,39 +409,27 @@ echo "<p class='error-msg'>❌ Please fill all fields</p>";
 
 <?php if(!isset($_SESSION['otp_sent'])){ ?>
 
-<?php if(isset($_GET['error']) && $_GET['error']=="invalidemail"){ ?>
-<p class="error-msg">❌ Email not registered</p>
-<?php } ?>
-
-<?php if(isset($_GET['error']) && $_GET['error']=="mailfail"){ ?>
-<p class="error-msg">❌ Failed to send OTP. Try again</p>
-<?php } ?>
-
-<!-- EMAIL INPUT -->
-
 <form action="forgot_password_process.php" method="POST">
-
-<input type="email" name="email" placeholder="Enter your registered email" required>
-
-<button name="send_otp">Send OTP</button>
-
+    <input type="email" name="email" placeholder="Enter your registered email" required>
+    <button name="send_otp">Send OTP</button>
 </form>
 
 <?php } else { ?>
 
-<!-- OTP INPUT -->
-
 <form method="POST">
+    <input type="text" name="otp" placeholder="Enter OTP" required>
+    <button name="verify_otp">Verify OTP</button>
 
-<input type="text" name="otp" placeholder="Enter OTP" required>
-
-<button name="verify_otp">Verify OTP</button>
-
-<?php if(isset($_SESSION['otp_error'])){ ?>
-<p class="error-msg"><?php echo $_SESSION['otp_error']; ?></p>
-<?php unset($_SESSION['otp_error']); } ?>
-
+    <?php if(isset($_SESSION['otp_error'])){ ?>
+        <p class="error-msg"><?php echo $_SESSION['otp_error']; ?></p>
+    <?php unset($_SESSION['otp_error']); } ?>
 </form>
+
+<p id="forgot_timer"></p>
+
+<button type="button" id="forgot_resend" onclick="resendForgotOTP()" disabled>
+    Resend OTP
+</button>
 
 <?php } ?>
 
@@ -453,6 +454,7 @@ echo "<p class='error-msg'>❌ Please fill all fields</p>";
 window.addEventListener('load', function(){
 document.getElementById('authModal').style.display='flex';
 showForgot();
+startForgotTimer();
 });
 </script>
 <?php } ?>

@@ -12,7 +12,7 @@ header("Location: index.php?error=emptyfields");
 exit();
 }
 
-$stmt = $conn->prepare("SELECT email,password FROM users WHERE email=?");
+$stmt = $conn->prepare("SELECT email,password,is_verified FROM users WHERE email=?");
 $stmt->bind_param("s",$email);
 $stmt->execute();
 
@@ -22,17 +22,24 @@ if($result->num_rows > 0){
 
 $row = $result->fetch_assoc();
 
+/* 🔐 CHECK EMAIL VERIFIED FIRST */
+if($row['is_verified'] == 0){
+    header("Location: index.php?error=notverified");
+    exit();
+}
+
+/* 🔑 THEN CHECK PASSWORD */
 if(password_verify($password,$row['password'])){
 
-$_SESSION['email'] = $row['email'];
+    $_SESSION['email'] = $row['email'];
 
-header("Location: index.php?msg=loginsuccess");
-exit();
+    header("Location: index.php?msg=loginsuccess");
+    exit();
 
 }else{
 
-header("Location: index.php?error=wrongpassword");
-exit();
+    header("Location: index.php?error=wrongpassword");
+    exit();
 
 }
 
