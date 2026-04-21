@@ -95,16 +95,16 @@ window.addEventListener("load", function(){
 
 let otpTime = 60;
 let otpInterval;
+let resendLock = false;
 
 /* SEND OTP */
 function sendOTP(){
     const email = document.getElementById("signup_email").value;
-
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if(!emailPattern.test(email)){
-    alert("Enter valid email");
-    return;
+        alert("Enter valid email");
+        return;
     }
 
     fetch("send_otp.php", {
@@ -120,14 +120,11 @@ function sendOTP(){
             alert("OTP sent ✅");
             document.getElementById("otp_section").style.display = "block";
             startOTPTimer();
-        }
-        else if(data === "exists"){
+        } else if(data === "exists"){
             alert("Email already registered ❌");
-        }
-        else if(data === "invalid"){
+        } else if(data === "invalid"){
             alert("Invalid email ❌");
-        }
-        else{
+        } else {
             alert("Failed to send OTP ❌");
         }
     });
@@ -138,9 +135,10 @@ function verifyOTP(){
     const otp = document.getElementById("otp").value;
 
     if(!/^[0-9]{6}$/.test(otp)){
-    alert("Enter valid 6-digit OTP");
-    return;
-}
+        alert("Enter valid 6-digit OTP");
+        return;
+    }
+
     fetch("verify_signup_otp.php", {
         method: "POST",
         headers: {"Content-Type": "application/x-www-form-urlencoded"},
@@ -148,31 +146,28 @@ function verifyOTP(){
     })
     .then(res => res.text())
     .then(data => {
-    data = data.trim();
+        data = data.trim();
 
-    if(data === "success"){
-        alert("Email Verified ✅");
+        if(data === "success"){
+            alert("Email Verified ✅");
 
-        document.getElementById("signup_password").disabled = false;
-        document.getElementById("signup_btn").disabled = false;
-        document.getElementById("signup_email").readOnly = true;
+            document.getElementById("signup_password").disabled = false;
+            document.getElementById("signup_btn").disabled = false;
+            document.getElementById("signup_email").readOnly = true;
 
-        clearInterval(otpInterval);
-        document.getElementById("otp_timer").innerText = "";
+            clearInterval(otpInterval);
+            document.getElementById("otp_timer").innerText = "";
 
-    }else if(data === "expired"){
-        alert("OTP Expired ⏳ Please resend");
-
-    }else if(data === "session_expired"){
-        alert("Session expired. Please try again.");
-
-    }else if(data === "invalid"){
-        alert("Invalid OTP format");
-
-    }else{
-        alert("Wrong OTP ❌");
-    }
-});
+        } else if(data === "expired"){
+            alert("OTP Expired ⏳ Please resend");
+        } else if(data === "session_expired"){
+            alert("Session expired. Please try again.");
+        } else if(data === "invalid"){
+            alert("Invalid OTP format");
+        } else {
+            alert("Wrong OTP ❌");
+        }
+    });
 }
 
 /* OTP TIMER */
@@ -196,6 +191,8 @@ function startOTPTimer(){
             clearInterval(otpInterval);
             if(timer) timer.innerText = "";
             if(resendBtn) resendBtn.disabled = false;
+
+            resendLock = false; // unlock here
         }
 
     }, 1000);
@@ -203,14 +200,21 @@ function startOTPTimer(){
 
 /* RESEND OTP (FIXED) */
 function resendOTP(){
+
+    if(resendLock) return; // prevent multiple clicks
+
     const email = document.getElementById("signup_email").value;
+    const resendBtn = document.getElementById("resend_btn");
 
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if(!emailPattern.test(email)){
-    alert("Enter valid email");
-    return;
+        alert("Enter valid email");
+        return;
     }
+
+    resendLock = true;
+    if(resendBtn) resendBtn.disabled = true;
 
     fetch("send_otp.php", {
         method: "POST",
@@ -224,9 +228,16 @@ function resendOTP(){
         if(data === "resent"){
             alert("OTP Resent ✅");
             startOTPTimer();
-        }else{
+        } else {
             alert("Resend failed ❌");
+
+            resendLock = false;
+            if(resendBtn) resendBtn.disabled = false;
         }
+    })
+    .catch(() => {
+        resendLock = false;
+        if(resendBtn) resendBtn.disabled = false;
     });
 }
 
@@ -236,6 +247,7 @@ function resendOTP(){
 
 let forgotTime = 60;
 let forgotInterval;
+let forgotResendLock = false;
 
 function startForgotTimer(){
     clearInterval(forgotInterval);
@@ -257,13 +269,23 @@ function startForgotTimer(){
             clearInterval(forgotInterval);
             if(timer) timer.innerText = "";
             if(resendBtn) resendBtn.disabled = false;
+
+            forgotResendLock = false; // unlock
         }
 
     }, 1000);
 }
 
-/* RESEND FORGOT OTP */
+/* RESEND FORGOT OTP (FIXED) */
 function resendForgotOTP(){
+
+    if(forgotResendLock) return;
+
+    const resendBtn = document.getElementById("forgot_resend");
+
+    forgotResendLock = true;
+    if(resendBtn) resendBtn.disabled = true;
+
     fetch("forgot_password_process.php", {
         method: "POST",
         headers: {"Content-Type": "application/x-www-form-urlencoded"},
@@ -276,12 +298,20 @@ function resendForgotOTP(){
         if(data === "resent"){
             alert("OTP Resent ✅");
             startForgotTimer();
+        } else if(data === "session_expired"){
+            alert("Session expired ❌");
 
-        }else if(data === "session_expired"){
-            alert("Session expired. Restart process ❌");
-
-        }else{
+            forgotResendLock = false;
+            if(resendBtn) resendBtn.disabled = false;
+        } else {
             alert("Resend failed ❌");
+
+            forgotResendLock = false;
+            if(resendBtn) resendBtn.disabled = false;
         }
+    })
+    .catch(() => {
+        forgotResendLock = false;
+        if(resendBtn) resendBtn.disabled = false;
     });
 }

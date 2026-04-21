@@ -9,12 +9,21 @@ require __DIR__ . '/PHPMailer/src/Exception.php';
 require __DIR__ . '/PHPMailer/src/PHPMailer.php';
 require __DIR__ . '/PHPMailer/src/SMTP.php';
 
-
 /* ========================================================= */
 /* ================= SEND / RESEND OTP ====================== */
 /* ========================================================= */
 
 if(isset($_POST['email']) || isset($_POST['resend'])){
+
+    // ================= RATE LIMIT (IMPORTANT) =================
+    if(isset($_SESSION['otp_last_sent'])){
+        $time_diff = time() - $_SESSION['otp_last_sent'];
+
+        if($time_diff < 60){ // 60 sec cooldown
+            echo "wait";
+            exit();
+        }
+    }
 
     // ================= RESEND CASE =================
     if(isset($_POST['resend'])){
@@ -37,7 +46,6 @@ if(isset($_POST['email']) || isset($_POST['resend'])){
             exit();
         }
 
-        // check if email already exists
         $stmt = $conn->prepare("SELECT id FROM users WHERE email=?");
         $stmt->bind_param("s",$email);
         $stmt->execute();
@@ -51,14 +59,15 @@ if(isset($_POST['email']) || isset($_POST['resend'])){
         $_SESSION['signup_email'] = $email;
     }
 
-
     // ================= GENERATE OTP =================
     $otp = random_int(100000,999999);
-    $expiry = time() + 300; // 5 minutes
+    $expiry = time() + 300;
 
     $_SESSION['signup_otp'] = $otp;
     $_SESSION['signup_expiry'] = $expiry;
 
+    // ✅ Save send time (VERY IMPORTANT)
+    $_SESSION['otp_last_sent'] = time();
 
     // ================= SEND MAIL =================
     $mail = new PHPMailer(true);
@@ -86,12 +95,7 @@ if(isset($_POST['email']) || isset($_POST['resend'])){
 
         $mail->send();
 
-        // response for JS
-        if(isset($_POST['resend'])){
-            echo "resent";
-        }else{
-            echo "sent";
-        }
+        echo isset($_POST['resend']) ? "resent" : "sent";
 
     }catch(Exception $e){
         echo "fail";
