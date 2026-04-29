@@ -16,6 +16,36 @@ align-items:center;
 color:#333;
 }
 
+/* ================= TOPBAR ================= */
+
+.topbar{
+width:100%;
+background:#111;
+color:#fff;
+padding:15px 30px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+position:fixed;
+top:0;
+left:0;
+z-index:1000;
+box-shadow:0 2px 10px rgba(0,0,0,0.3);
+}
+
+.logout-link{
+color:#fff;
+text-decoration:none;
+background:#dc3545;
+padding:8px 15px;
+border-radius:5px;
+transition:0.3s;
+}
+
+.logout-link:hover{
+background:#a71d2a;
+}
+
 /* ================= LOGIN ================= */
 
 .admin-container{
@@ -34,24 +64,32 @@ font-weight:600;
 color:#222;
 }
 
+.subtitle{
+text-align:center;
+margin-bottom:20px;
+color:#555;
+}
+
 /* INPUTS */
 
 .admin-container input,
 .admin-container select{
 width:100%;
 padding:12px;
-margin:12px 0;
+margin:10px 0;
 border:1px solid #ddd;
 border-radius:6px;
 font-size:15px;
 transition:0.3s;
+background:#fafafa;
 }
 
 .admin-container input:focus,
 .admin-container select:focus{
 border-color:#007bff;
 outline:none;
-box-shadow:0 0 5px rgba(0,123,255,0.3);
+box-shadow:0 0 6px rgba(0,123,255,0.3);
+background:#fff;
 }
 
 /* BUTTON */
@@ -78,10 +116,11 @@ box-shadow:0 5px 15px rgba(0,0,0,0.2);
 .dashboard{
 width:1000px;
 background:#ffffff;
-padding:40px;
+padding:50px 40px;
 border-radius:12px;
 box-shadow:0 15px 40px rgba(0,0,0,0.25);
 animation:fadeIn 0.6s ease;
+margin-top:70px;
 }
 
 .dashboard h2{
@@ -139,8 +178,8 @@ background:#0056b3;
 /* CARD HOVER EFFECT */
 
 .card:hover{
-transform:translateY(-5px);
-box-shadow:0 10px 25px rgba(0,0,0,0.15);
+transform:translateY(-6px);
+box-shadow:0 12px 25px rgba(0,0,0,0.15);
 }
 
 /* LOGOUT SPECIAL */
@@ -153,39 +192,76 @@ background:#dc3545;
 background:#a71d2a;
 }
 
-/* ================= UPLOAD PAGE ================= */
+/* ================= PROFESSIONAL UPLOAD PAGE ================= */
 
 .upload-container{
-width:500px;
+width:420px;
 background:white;
-padding:40px;
+padding:35px 30px;
 border-radius:12px;
-box-shadow:0 15px 40px rgba(0,0,0,0.25);
+box-shadow:0 20px 50px rgba(0,0,0,0.3);
 animation:fadeIn 0.6s ease;
+margin-top:70px;
 }
 
 .upload-container h2{
 text-align:center;
+margin-bottom:5px;
+font-weight:600;
+color:#222;
+}
+
+.subtitle{
+text-align:center;
+font-size:14px;
+color:#777;
 margin-bottom:25px;
 }
+
+/* FORM GROUP */
+
+.form-group{
+margin-bottom:18px;
+text-align:left;
+}
+
+.form-group label{
+display:block;
+margin-bottom:6px;
+font-size:14px;
+font-weight:500;
+color:#444;
+}
+
+/* INPUTS */
 
 .upload-container input,
 .upload-container select{
 width:100%;
-padding:12px;
-margin:12px 0;
+padding:11px;
 border:1px solid #ddd;
 border-radius:6px;
-font-size:15px;
+font-size:14px;
 transition:0.3s;
+background:#f9f9f9;
 }
 
 .upload-container input:focus,
 .upload-container select:focus{
 border-color:#28a745;
 outline:none;
-box-shadow:0 0 5px rgba(40,167,69,0.3);
+background:#fff;
+box-shadow:0 0 6px rgba(40,167,69,0.3);
 }
+
+/* FILE INPUT FIX */
+
+.upload-container input[type="file"]{
+background:white;
+padding:8px;
+}
+
+/* BUTTON */
 
 .upload-container button{
 width:100%;
@@ -194,46 +270,15 @@ background:linear-gradient(45deg,#28a745,#1e7e34);
 border:none;
 color:white;
 border-radius:6px;
-font-size:16px;
+font-size:15px;
 cursor:pointer;
 transition:0.3s;
+margin-top:10px;
 }
 
 .upload-container button:hover{
 transform:translateY(-2px);
-box-shadow:0 5px 15px rgba(0,0,0,0.2);
-}
-.topbar{
-width:100%;
-background:#111;
-color:#fff;
-padding:15px 30px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-position:absolute;
-top:0;
-left:0;
-}
-
-.logout-link{
-color:#fff;
-text-decoration:none;
-background:#dc3545;
-padding:8px 15px;
-border-radius:5px;
-}
-
-.subtitle{
-text-align:center;
-margin-bottom:20px;
-color:#555;
-}
-
-.success-msg{
-color:green;
-text-align:center;
-margin-bottom:15px;
+box-shadow:0 8px 20px rgba(0,0,0,0.2);
 }
 
 /* ================= ANIMATION ================= */

@@ -197,7 +197,7 @@ if(isset($_SESSION['email'])){
 <div class="card">
 <h3>HTML Roadmap</h3>
 <p>Complete HTML learning path</p>
-<a href="roadmaps/html-roadmap.pdf" class="btn" target="_blank">View Roadmap</a>
+<a href="html_roadmap.pdf" class="btn" target="_blank">View Roadmap</a>
 </div>
 
 <div class="card">
