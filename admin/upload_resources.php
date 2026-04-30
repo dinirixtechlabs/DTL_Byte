@@ -2,7 +2,6 @@
 session_start();
 include "../db.php";
 
-// HANDLE FORM SUBMIT
 if(isset($_POST['upload'])){
 
     $title = trim($_POST['title']);
@@ -19,8 +18,27 @@ if(isset($_POST['upload'])){
     $size = $_FILES['file']['size'];
 
     $fileName = time() . "_" . preg_replace("/[^a-zA-Z0-9\._-]/", "", $file);
-    $folder = "../uploads/pdf/";
 
+    // ✅ Dynamic folder selection
+    switch($category){
+        case "roadmap":
+            $folder = "../roadmap/";
+            break;
+
+        case "notes":
+            $folder = "../notes/";
+            break;
+
+        case "sourcecode":
+            $folder = "../sourcecode/";
+            break;
+
+        default:
+            echo "Invalid category!";
+            exit();
+    }
+
+    // ✅ Auto create folder if not exist
     if(!is_dir($folder)){
         mkdir($folder, 0777, true);
     }
@@ -28,6 +46,7 @@ if(isset($_POST['upload'])){
     $filePath = $folder . $fileName;
     $fileType = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 
+    // ✅ File validation
     if(in_array($category, ["roadmap", "notes"]) && $fileType != "pdf"){
         echo "Only PDF allowed!";
         exit();
@@ -43,6 +62,7 @@ if(isset($_POST['upload'])){
         exit();
     }
 
+    // ✅ Upload
     if(move_uploaded_file($tmp, $filePath)){
         $stmt = $conn->prepare("INSERT INTO resources(title, category, file_name, course) VALUES (?, ?, ?, ?)");
         $stmt->bind_param("ssss", $title, $category, $fileName, $course);

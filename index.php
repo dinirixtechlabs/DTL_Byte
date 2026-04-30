@@ -187,108 +187,103 @@ if(isset($_SESSION['email'])){
 
 <div class="container">
 
+<?php include 'db.php'; ?>
 
-<!-- ROADMAP -->
+<!-- ================= ROADMAP ================= -->
 
 <h2 id="roadmaps" class="section-title">Roadmaps</h2>
 
 <div class="cards">
+<?php
+$query = "SELECT * FROM resources WHERE category='roadmap' ORDER BY id DESC";
+$result = mysqli_query($conn, $query);
 
-<div class="card">
-<h3>HTML Roadmap</h3>
-<p>Complete HTML learning path</p>
-<a href="html_roadmap.pdf" class="btn" target="_blank">View Roadmap</a>
+if(mysqli_num_rows($result) > 0){
+    while($row = mysqli_fetch_assoc($result)){
+        $filePath = $row['category'] . "/" . $row['file_name'];
+?>
+        <div class="card">
+            <h3><?php echo htmlspecialchars($row['title']); ?></h3>
+            <p><?php echo htmlspecialchars($row['course']); ?></p>
+            <a href="<?php echo $filePath; ?>" class="btn" target="_blank">View Roadmap</a>
+        </div>
+<?php
+    }
+} else {
+?>
+        <div class="card">
+            <h3>No Roadmaps Yet</h3>
+            <p>Upload will appear here</p>
+        </div>
+<?php
+}
+?>
 </div>
 
-<div class="card">
-<h3>CSS Roadmap</h3>
-<p>Step-by-step CSS learning</p>
-<a href="roadmaps/css-roadmap.pdf" class="btn" target="_blank">View Roadmap</a>
-</div>
 
-<div class="card">
-<h3>JavaScript Roadmap</h3>
-<p>Modern JavaScript roadmap</p>
-<a href="roadmaps/js-roadmap.pdf" class="btn" target="_blank">View Roadmap</a>
-</div>
-
-<div class="card">
-<h3>Python Roadmap</h3>
-<p>Backend & automation roadmap</p>
-<a href="roadmaps/python-roadmap.pdf" class="btn" target="_blank">View Roadmap</a>
-</div>
-
-</div>
-
-
-<!-- NOTES -->
+<!-- ================= NOTES ================= -->
 
 <h2 id="notes" class="section-title">Notes</h2>
 
 <div class="cards">
+<?php
+$query = "SELECT * FROM resources WHERE category='notes' ORDER BY id DESC";
+$result = mysqli_query($conn, $query);
 
-<div class="card">
-<h3>HTML Notes</h3>
-<p>Beginner to advanced notes</p>
-<a href="payment.php?item=html_notes" class="btn lock-btn">Unlock Notes</a>
+if(mysqli_num_rows($result) > 0){
+    while($row = mysqli_fetch_assoc($result)){
+?>
+        <div class="card">
+            <h3><?php echo htmlspecialchars($row['title']); ?></h3>
+            <p><?php echo htmlspecialchars($row['course']); ?></p>
+            <a href="payment.php?item=<?php echo urlencode($row['file_name']); ?>" class="btn lock-btn">
+                Unlock Notes
+            </a>
+        </div>
+<?php
+    }
+} else {
+?>
+        <div class="card">
+            <h3>No Notes Yet</h3>
+            <p>Upload will appear here</p>
+        </div>
+<?php
+}
+?>
 </div>
 
-<div class="card">
-<h3>CSS Notes</h3>
-<p>Complete CSS guide</p>
-<a href="payment.php?item=css_notes" class="btn lock-btn">Unlock Notes</a>
-</div>
 
-<div class="card">
-<h3>JavaScript Notes</h3>
-<p>Modern JS concepts</p>
-<a href="payment.php?item=js_notes" class="btn lock-btn">Unlock Notes</a>
-</div>
-
-<div class="card">
-<h3>Python Notes</h3>
-<p>Python programming guide</p>
-<a href="payment.php?item=python_notes" class="btn lock-btn">Unlock Notes</a>
-</div>
-
-</div>
-
-
-<!-- SOURCE CODE -->
+<!-- ================= SOURCE CODE ================= -->
 
 <h2 id="source" class="section-title">Source Codes</h2>
 
 <div class="cards">
+<?php
+$query = "SELECT * FROM resources WHERE category='sourcecode' ORDER BY id DESC";
+$result = mysqli_query($conn, $query);
 
-<div class="card">
-<h3>Python Projects</h3>
-<p>Beginner Python projects</p>
-<a href="payment.php?item=python_source" class="btn lock-btn">Unlock Source</a>
-</div>
-
-<div class="card">
-<h3>Java Projects</h3>
-<p>Java practice projects</p>
-<a href="payment.php?item=java_source" class="btn lock-btn">Unlock Source</a>
-</div>
-
-<div class="card">
-<h3>Login System</h3>
-<p>PHP Login system project</p>
-<a href="payment.php?item=login_source" class="btn lock-btn">Unlock Source</a>
-</div>
-
-<div class="card">
-<h3>Portfolio Website</h3>
-<p>HTML CSS portfolio project</p>
-<a href="payment.php?item=portfolio_source" class="btn lock-btn">Unlock Source</a>
-</div>
-
-</div>
-
-
-</div>
-</div>
+if(mysqli_num_rows($result) > 0){
+    while($row = mysqli_fetch_assoc($result)){
+?>
+        <div class="card">
+            <h3><?php echo htmlspecialchars($row['title']); ?></h3>
+            <p><?php echo htmlspecialchars($row['course']); ?></p>
+            <a href="payment.php?item=<?php echo urlencode($row['file_name']); ?>" class="btn lock-btn">
+                Unlock Source
+            </a>
+        </div>
+<?php
+    }
+} else {
+?>
+        <div class="card">
+            <h3>No Source Codes Yet</h3>
+            <p>Upload will appear here</p>
+        </div>
+<?php
+}
+?>
 </div>
 
 
